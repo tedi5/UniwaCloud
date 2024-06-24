@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+  mysql-master:
+    image: mysql:5.7
+    container_name: mysql-master
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - master-data:/var/lib/mysql
+    networks:
+      - mysql-network
+
+  mysql-slave:
+    image: mysql:5.7
+    container_name: mysql-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_MASTER_HOST: mysql-master
+      MYSQL_MASTER_PORT: 3306
+    volumes:
+      - slave-data:/var/lib/mysql
+    networks:
+      - mysql-network
+    depends_on:
+      - mysql-master
+
+networks:
+  mysql-network:
+    driver: bridge
+
+volumes:
+  master-data:
+  slave-data:
